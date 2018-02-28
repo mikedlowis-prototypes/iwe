@@ -85,54 +85,55 @@ static unsigned int tabspaces = 8;
 
 /* Terminal colors (16 first used in escape sequence) */
 static const char *colorname[] = {
-    /* solarized dark */
-    "#073642",  /*  0: black    */
-    "#dc322f",  /*  1: red      */
-    "#859900",  /*  2: green    */
-    "#b58900",  /*  3: yellow   */
-    "#268bd2",  /*  4: blue     */
-    "#d33682",  /*  5: magenta  */
-    "#2aa198",  /*  6: cyan     */
-    "#eee8d5",  /*  7: white    */
-    "#002b36",  /*  8: brblack  */
-    "#cb4b16",  /*  9: brred    */
-    "#586e75",  /* 10: brgreen  */
-    "#657b83",  /* 11: bryellow */
-    "#839496",  /* 12: brblue   */
-    "#6c71c4",  /* 13: brmagenta*/
-    "#93a1a1",  /* 14: brcyan   */
-    "#fdf6e3",  /* 15: brwhite  */
+    /* gruvbox dark hard */
+    "#1d2021",
+    "#cc241d",
+    "#98971a",
+    "#fb4934",
+    "#d79921",
+    "#458588",
+    "#b16286",
+    "#689d6a",
+    "#a89984",
+    "#928374",
+    "#b8bb26",
+    "#fabd2f",
+    "#83a598",
+    "#d3869b",
+    "#8ec07c",
+    "#ebdbb2",
 };
+
 
 /* Terminal colors for alternate (light) palette */
 static const char *altcolorname[] = {
-    /* solarized light */
-    "#eee8d5",  /*  0: black    */
-    "#dc322f",  /*  1: red      */
-    "#859900",  /*  2: green    */
-    "#b58900",  /*  3: yellow   */
-    "#268bd2",  /*  4: blue     */
-    "#d33682",  /*  5: magenta  */
-    "#2aa198",  /*  6: cyan     */
-    "#073642",  /*  7: white    */
-    "#fdf6e3",  /*  8: brblack  */
-    "#cb4b16",  /*  9: brred    */
-    "#93a1a1",  /* 10: brgreen  */
-    "#839496",  /* 11: bryellow */
-    "#657b83",  /* 12: brblue   */
-    "#6c71c4",  /* 13: brmagenta*/
-    "#586e75",  /* 14: brcyan   */
-    "#002b36",  /* 15: brwhite  */
+    /* gruvbox dark hard */
+    "#1d2021",
+    "#cc241d",
+    "#98971a",
+    "#fb4934",
+    "#d79921",
+    "#458588",
+    "#b16286",
+    "#689d6a",
+    "#a89984",
+    "#928374",
+    "#b8bb26",
+    "#fabd2f",
+    "#83a598",
+    "#d3869b",
+    "#8ec07c",
+    "#ebdbb2",
 };
 
 /*
  * Default colors (colorname index)
  * foreground, background, cursor, reverse cursor
  */
-static unsigned int defaultfg = 12;
-static unsigned int defaultbg = 8;
-static unsigned int defaultcs = 14;
-static unsigned int defaultrcs = 15;
+static unsigned int defaultfg = 8;
+static unsigned int defaultbg = 0;
+static unsigned int defaultcs = 8;
+static unsigned int defaultrcs = 0;
 
 /*
  * Default shape of cursor
@@ -458,3 +459,17 @@ static char ascii_printable[] =
     "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     "`abcdefghijklmnopqrstuvwxyz{|}~";
 
+#ifdef __MACH__
+#include <mach/clock.h>
+#include <mach/mach.h>
+#define CLOCK_MONOTONIC 0
+void clock_gettime(int clkid, struct timespec *ts) {
+    clock_serv_t cclock;
+    mach_timespec_t mts;
+    host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
+    clock_get_time(cclock, &mts);
+    mach_port_deallocate(mach_task_self(), cclock);
+    ts->tv_sec  = mts.tv_sec;
+    ts->tv_nsec = mts.tv_nsec;
+}
+#endif
