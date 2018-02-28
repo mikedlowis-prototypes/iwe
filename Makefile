@@ -4,10 +4,12 @@ include config.mk
 
 all: dmenu/dmenu dmenu/stest dwm/dwm slock/slock st/st
 
-install:
-	#cp dmenu/dmenu ${PREFIX}/bin/
-	#cp dmenu/dmenu_run ${PREFIX}/bin/
-	#cp dmenu/dmenu_patches ${PREFIX}/bin/
+install: all
+	mkdir -p ${PREFIX}/bin
+	cp -f dmenu/{dmenu,dmenu_run,dmenu_path,stest} ${PREFIX}/bin/
+	cp -f dwm/dwm ${PREFIX}/bin/
+	cp -f slock/slock ${PREFIX}/bin/
+	cp -f st/st ${PREFIX}/bin/
 
 .c.o:
 	${CC} -c -o $@ ${CFLAGS} $<
