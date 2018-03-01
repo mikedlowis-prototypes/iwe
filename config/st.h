@@ -5,7 +5,11 @@
  *
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
+#ifdef __MACH__
+static char font[] = "Monaco:size=11:antialias=true:autohint=true";
+#else
 static char font[] = "Liberation Mono:pixelsize=14:antialias=true:autohint=true";
+#endif
 static int borderpx = 2;
 #define histsize 5000
 
@@ -94,7 +98,7 @@ static const char *colorname[] = {
     "#458588",
     "#b16286",
     "#689d6a",
-    "#a89984",
+    "#d5c4a1",
     "#928374",
     "#b8bb26",
     "#fabd2f",
@@ -458,18 +462,3 @@ static char ascii_printable[] =
     " !\"#$%&'()*+,-./0123456789:;<=>?"
     "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     "`abcdefghijklmnopqrstuvwxyz{|}~";
-
-#ifdef __MACH__
-#include <mach/clock.h>
-#include <mach/mach.h>
-#define CLOCK_MONOTONIC 0
-void clock_gettime(int clkid, struct timespec *ts) {
-    clock_serv_t cclock;
-    mach_timespec_t mts;
-    host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
-    clock_get_time(cclock, &mts);
-    mach_port_deallocate(mach_task_self(), cclock);
-    ts->tv_sec  = mts.tv_sec;
-    ts->tv_nsec = mts.tv_nsec;
-}
-#endif
