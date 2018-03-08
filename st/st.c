@@ -552,6 +552,9 @@ static uchar utfmask[UTF_SIZ + 1] = {0xC0, 0x80, 0xE0, 0xF0, 0xF8};
 static Rune utfmin[UTF_SIZ + 1] = {       0,    0,  0x80,  0x800,  0x10000};
 static Rune utfmax[UTF_SIZ + 1] = {0x10FFFF, 0x7F, 0x7FF, 0xFFFF, 0x10FFFF};
 
+char *cwd;
+char *plumber_cmd = "tfetch";
+
 /* Font Ring Cache */
 enum {
     FRC_NORMAL,
@@ -1287,12 +1290,17 @@ brelease(XEvent *e)
 
     if (e->xbutton.button == Button2) {
         selpaste(NULL);
+    } else if (e->xbutton.button == Button3 && !fork()) {
+        char cmd[100 + strlen(cwd)];
+        sprintf(cmd, "(cd %s ; tfetch '%s')", cwd, sel.primary);
+        exit(execvp( "sh", (char*[]){ "/bin/sh", "-c", cmd, 0 }));
     } else if (e->xbutton.button == Button1) {
         if (sel.mode == SEL_READY) {
             getbuttoninfo(e);
             selcopy(e->xbutton.time);
-        } else
+        } else {
             selclear(NULL);
+        }
         sel.mode = SEL_IDLE;
         tsetdirt(sel.nb.y, sel.ne.y);
     }
@@ -2558,6 +2566,10 @@ strhandle(void)
     switch (strescseq.type) {
     case ']': /* OSC -- Operating System Command */
         switch (par) {
+        case 7:
+            if (narg > 1 && access(strescseq.args[1], X_OK) != -1)
+                cwd = strescseq.args[1];
+            return;
         case 0:
         case 1:
         case 2:
