@@ -1291,9 +1291,7 @@ brelease(XEvent *e)
     if (e->xbutton.button == Button2) {
         selpaste(NULL);
     } else if (e->xbutton.button == Button3 && !fork()) {
-        char cmd[100 + strlen(cwd)];
-        sprintf(cmd, "(cd %s ; tfetch '%s')", cwd, sel.primary);
-        exit(execvp( "sh", (char*[]){ "/bin/sh", "-c", cmd, 0 }));
+        exit(execvp("tfetch", (char*[]){ "tfetch", sel.primary, 0 }));
     } else if (e->xbutton.button == Button1) {
         if (sel.mode == SEL_READY) {
             getbuttoninfo(e);
@@ -2567,8 +2565,8 @@ strhandle(void)
     case ']': /* OSC -- Operating System Command */
         switch (par) {
         case 7:
-            if (narg > 1 && access(strescseq.args[1], X_OK) != -1)
-                cwd = strescseq.args[1];
+            if (narg > 1 && strescseq.args[1])
+                chdir(strescseq.args[1]);
             return;
         case 0:
         case 1:
